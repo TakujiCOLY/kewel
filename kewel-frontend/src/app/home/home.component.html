@@ -1,0 +1,209 @@
+<header class="app-header">
+  <a href="#" class="app-header__logo">
+    <span>Kewël</span>
+  </a>
+  <ul class="app-nav">
+    <li class="app-nav-user">Prénom nom</li>
+    <li class="dropdown">
+      <a href="#" class="app-nav__item" data-toggle="dropdown" aria-label="Open Menu">
+        <i class="fa fa-user"></i>
+      </a>
+      <ul class="dropdown-menu settings-menu dropdown-menu-right">
+        <li><a href="#" class="dropdown-item"><i class="fa fa-cog"></i> Paramètres</a></li>
+        <li><a href="#" class="dropdown-item"><i class="fa fa-user"></i> Profil</a></li>
+        <li><a href="#" class="dropdown-item"><i class="fa fa-sign-out-alt"></i> Déconnexion</a></li>
+      </ul>
+    </li>
+  </ul>
+</header>
+<div class="app-content">
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 mb-2">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-header__title">
+            <a type="button" class="btn btn-success" (click)="open(ajout_employe)"><i class="fa fa-plus"></i></a>
+          </h4>
+          <button class="btn btn-success" (click)="getData()"><i class="fa fa-users"></i></button>
+          <form [formGroup]="searchEmployeForm" (ngSubmit)="searchEmploye()">
+            <input type="text" placeholder="Nom" class="mr-2" formControlName="nom">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search ml-2"></i></button>
+          </form>
+        </div>
+        <div class="card-body">
+          <div class="text-center">
+            <h4>Liste des employés</h4>
+          </div>
+          <table class="table table-bordered table-sm">
+            <thead class="text-center">
+              <tr>
+                <th>ID</th>
+                <th>Matricule</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Email</th>
+                <th>Adresse</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let employe of employes | paginate : {itemsPerPage: ipp, currentPage: p}">
+                <td>{{employe.id}}</td>
+                <td>{{employe.matricule}}</td>
+                <td>{{employe.nom}}</td>
+                <td>{{employe.prenom}}</td>
+                <td>{{employe.email}}</td>
+                <td>{{employe.adresse}}</td>
+                <td class="text-center">
+                  <a type="button" (click)="openUpdate(edit_employe, employe)" class="btn btn-secondary"><i
+                      class="fa fa-edit"></i></a>
+                  <a type="button" (click)="openDelete(delete_employe, employe.id)" class="btn btn-danger"><i
+                      class="fa fa-trash"></i></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-right" *ngIf="employes">
+            <pagination-controls (pageChange)="p = $event" previousLabel="Précédent" nextLabel="Suivant">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer class="app-footer">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 text-right">
+        Kewël - Tous droits réservés
+      </div>
+    </div>
+  </div>
+</footer>
+
+<ng-template #ajout_employe let-modal>
+  <div class="modal-header">
+    <h4 class="modal-header__title">Ajouter un Employe</h4>
+    <button class="close" aria-label="close" type="button" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form [formGroup]="addEmployeForm" (ngSubmit)="addEmploye()">
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-3 col-sm-3">
+          <div class="form-group">
+            <label for="">Matricule</label>
+            <input type="number" class="form-control" placeholder="Matricule"
+              [ngClass]="{'is-invalid': submittedAdd && fAdd.matricule.errors}" formControlName="matricule">
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">
+          <div class="form-group">
+            <label for="">Nom</label>
+            <input type="text" class="form-control" placeholder="Nom"
+              [ngClass]="{'is-invalid': submittedAdd && fAdd.nom.errors}" formControlName="nom">
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">
+          <div class="form-group">
+            <label for="">Prénom</label>
+            <input type="text" class="form-control" placeholder="Prénom"
+              [ngClass]="{'is-invalid': submittedAdd && fAdd.prenom.errors}" formControlName="prenom">
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">
+          <div class="form-group">
+            <label for="">Email</label>
+            <input type="email" class="form-control" placeholder="Email"
+              [ngClass]="{'is-invalid': submittedAdd && fAdd.email.errors}" formControlName="email">
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">
+          <div class="form-group">
+            <label for="">Adresse</label>
+            <input type="text" class="form-control" placeholder="Adresse"
+              [ngClass]="{'is-invalid': submittedAdd && fAdd.adresse.errors}" formControlName="adresse">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger" aria-label="close" (click)="modal.dismiss()">Fermer</button>
+      <button type="submit" class="btn btn-primary">Ajouter</button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #edit_employe let-modal>
+  <div class="modal-header">
+    <h4 class="modal-header__title">Modifier un Employe</h4>
+    <button class="close" aria-label="close" type="button" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form [formGroup]="editEmployeForm" (ngSubmit)="updateEmploye()">
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-3 col-sm-3">
+          <div class="form-group">
+            <label for="">Matricule</label>
+            <input type="number" class="form-control" placeholder="Matricule"
+              [ngClass]="{'is-invalid': submittedUpdate && fUpdate.matricule.errors}" formControlName="matricule">
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">
+          <div class="form-group">
+            <label for="">Nom</label>
+            <input type="text" class="form-control" placeholder="Nom"
+              [ngClass]="{'is-invalid': submittedUpdate && fUpdate.nom.errors}" formControlName="nom">
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">
+          <div class="form-group">
+            <label for="">Prénom</label>
+            <input type="text" class="form-control" placeholder="Prénom"
+              [ngClass]="{'is-invalid': submittedUpdate && fUpdate.prenom.errors}" formControlName="prenom">
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">
+          <div class="form-group">
+            <label for="">Email</label>
+            <input type="email" class="form-control" placeholder="Email"
+              [ngClass]="{'is-invalid': submittedUpdate && fUpdate.email.errors}" formControlName="email">
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">
+          <div class="form-group">
+            <label for="">Adresse</label>
+            <input type="text" class="form-control" placeholder="Adresse"
+              [ngClass]="{'is-invalid': submittedUpdate && fUpdate.adresse.errors}" formControlName="adresse">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger" aria-label="close" (click)="modal.dismiss()">Fermer</button>
+      <button type="submit" class="btn btn-primary">Modifier</button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #delete_employe let-modal>
+  <div class="modal-header">
+    <h4 class="modal-header__title">Supprimer un Employe</h4>
+    <button class="close" aria-label="close" type="button" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form>
+    <div class="modal-body">
+      <h5>Voulez vous supprimer cet employés?</h5>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger" aria-label="close" (click)="modal.dismiss()">Non</button>
+      <button type="button" (click)="deleteEmploye(idDelete)" class="btn btn-primary">Oui</button>
+    </div>
+  </form>
+</ng-template>
